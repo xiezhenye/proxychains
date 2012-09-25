@@ -11,6 +11,10 @@ if [ $# = 0 ] ; then
 	exit
 fi
 
+awk 'BEGIN{ARGC=0; found=0} {if (substr($1,0,1)!="#"){ for(i=2;i<=NF;i++){if (substr($i,0,1)=="#"){break;}if($i==ARGV[1] && $1!~":"){print $1;found=1}} }} END{exit found?0:1}' "$1" </etc/hosts
+if [[ "$?" -eq "0" ]]; then
+        exit
+fi
 
 export LD_PRELOAD=libproxychains.so
-dig $1 @$DNS_SERVER +tcp | awk '/A.+[0-9]+\.[0-9]+\.[0-9]/{print $5;}'
+dig "$1" @$DNS_SERVER +tcp | awk '/A.+[0-9]+\.[0-9]+\.[0-9]/{print $5;}'
